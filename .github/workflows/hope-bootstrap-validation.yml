@@ -30,3 +30,35 @@ jobs:
       - name: Assert no secret or generated key files
         run: |
           ! find . -type f \( -name 'gha-creds-*.json' -o -name '*-service-account.json' -o -name '*.json.key' \) | grep .
+
+  live-read:
+    name: Manual HOPE OIDC reader proof (no promotion)
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/feature/hope-bootstrap-ssid-20261009' }}
+    runs-on: ubuntu-latest
+    environment: hope-ssid-read-validation
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: auth
+        name: Exchange GitHub OIDC for short-lived Sheets-readonly token
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: spieleengine
+          workload_identity_provider: projects/957694117473/locations/global/workloadIdentityPools/github/providers/hope
+          service_account: hope-ssid-reader@spieleengine.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_lifetime: 600s
+          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
+          create_credentials_file: false
+      - name: Prove authenticated read-only SSID gateway
+        env:
+          PYTHONPATH: src
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python tools/hope_ssid_probe.py --live
