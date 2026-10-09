@@ -22,5 +22,12 @@ An approved **read-only** proof workflow should request short-lived
 `LIVE_SHEET_READ_PASS_NOT_RUNTIME_INTEGRATION`.
 Its manual dispatch may require a separate inert default-branch workflow.
 
-The current bootstrap workflow runs only credential-free offline checks.
-No Google Cloud IAM change or OAuth test has been performed by this branch.
+The candidate workflow `.github/workflows/hope-bootstrap-validation.yml` has a
+manual-only `live-read` job on feature branch
+`feature/hope-bootstrap-ssid-20261009`, using protected environment
+`hope-ssid-read-validation`, the dedicated future provider
+`github/providers/hope`, and the verified HOPE service account.
+Routine pushes and PR checks run credential-free offline checks only.
+No Google Cloud IAM change or live OAuth test has been performed by this branch.
+Do not run the manual job before the Google provider and service-account IAM
+binding have been reviewed and created.
