@@ -1,0 +1,32 @@
+name: HOPE bootstrap and SSID fail-closed checks
+
+on:
+  push:
+    branches:
+      - feature/hope-bootstrap-ssid-20261009
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    name: Offline identity and routing tests (no credentials)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline fail-closed regression tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Assert no secret or generated key files
+        run: |
+          ! find . -type f \( -name 'gha-creds-*.json' -o -name '*-service-account.json' -o -name '*.json.key' \) | grep .
