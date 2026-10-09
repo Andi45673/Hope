@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+!*.env.example
+*.json.key
+*-service-account.json
+gha-creds-*.json
+.coverage
+.pytest_cache/
