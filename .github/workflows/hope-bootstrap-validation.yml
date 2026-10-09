@@ -1,0 +1,21 @@
+# Inert dispatch registration only; no Google Cloud token, read, deployment,
+# service-account key, registry mutation or runtime permission on main.
+# The approved feature ref has the separate live-read job, which is bound
+# by a future dedicated Google OIDC provider to that exact workflow/ref.
+name: HOPE bootstrap and SSID fail-closed checks
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap-only:
+    name: Safe dispatch registration (main is inert)
+    runs-on: ubuntu-latest
+    steps:
+      - name: No cloud operations
+        run: |
+          echo 'No cloud or HOPE runtime permissions in main.'
+          echo 'The HOPE feature branch is a HOLD candidate only.'
